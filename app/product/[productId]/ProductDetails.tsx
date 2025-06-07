@@ -4,9 +4,11 @@ import Button from "@/app/components/Button";
 import ProductImage from "@/app/components/products/ProductImage";
 import SetColor from "@/app/components/products/SetColor";
 import SetQuatity from "@/app/components/products/SetQuantity";
+import { useCart } from "@/hooks/useCart";
 import { Rating } from "@mui/material";
+import { useRouter } from "next/navigation";
 //import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MdCheckCircle } from "react-icons/md";
 
 interface ProductDetailsProps {
@@ -43,6 +45,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ products }) => {
   ) {
     return <p>Produit non disponible ou données manquantes.</p>;
   }
+  const { handleAddProductToCart, cartProducts } = useCart();
 
   const [isProductInCart, setIsProductInCart] = useState(false);
   const [cartProduct, setCartProduct] = useState<CartProductType>({
@@ -55,6 +58,23 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ products }) => {
     quantity: 1,
     price: products.price,
   });
+
+   const router = useRouter();
+
+  useEffect(() => {
+    setIsProductInCart(false);
+
+    if (cartProducts) {
+      const existingIndex = cartProducts.findIndex(
+        (item) => item.id === products.id
+      );
+      console.log(cartProduct)
+
+      if (existingIndex > -1) {
+        setIsProductInCart(true);
+      }
+    }
+  }, [cartProducts,products.id]);
 
   // Calcul sécurisé de la note moyenne
   const productRating =
@@ -120,7 +140,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ products }) => {
                 label="View Cart"
                 outline
                 onClick={() => {
-                  // Action à définir
+                 router.push("/cart")
                 }}
               />
             </div>
@@ -143,7 +163,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ products }) => {
               <Button
                 label="Add To Cart"
                 onClick={() => {
-                  // Action à définir
+                   handleAddProductToCart(cartProduct);
                 }}
               />
             </div>

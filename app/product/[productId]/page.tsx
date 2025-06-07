@@ -1,6 +1,7 @@
 import Container from "@/app/components/nav/Container";
 import ProductDetails from "./ProductDetails";
 import { products } from "@/utils/products";
+import ListRating from "./ListRating";
 
 interface IParams {
   productId: string;
@@ -27,6 +28,11 @@ const ProductPage = async ({ params }: { params: IParams }) => {
     <div className="p-8">
       <Container>
         <ProductDetails products={product} />
+          <div className="flex flex-col mt-20 gap-4">
+          <div>AddRating </div>
+           <ListRating product={product} />
+           
+        </div>
       </Container>
     </div>
   );
