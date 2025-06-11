@@ -8,9 +8,13 @@ import MenuItem from "./MenuItem";
 import { signOut } from "next-auth/react";
 import BackDrop from "./BackDrop";
 import { User } from "@prisma/client";
+import { SafeUser } from "@/types";
 
+interface UserMenuProps {
+  currentUser: SafeUser | null;
+}
 
-const UserMenu = () => {
+const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleOpen = useCallback(() => {
@@ -37,7 +41,7 @@ const UserMenu = () => {
         text-slate-700
         "
         >
-          <Avatar  />
+          <Avatar src={currentUser?.image} />
           <AiFillCaretDown />
         </div>
         {isOpen && (
@@ -56,7 +60,7 @@ const UserMenu = () => {
             cursor-pointer
             "
           >
-           
+            {currentUser ? (
               <div>
                 <Link href="/orders">
                   <MenuItem onClick={toggleOpen}>Your Orders</MenuItem>
@@ -74,7 +78,7 @@ const UserMenu = () => {
                   Logout
                 </MenuItem>
               </div>
-        
+            ) : (
               <div>
                 <Link href="/login">
                   <MenuItem onClick={toggleOpen}>Login</MenuItem>
@@ -83,7 +87,7 @@ const UserMenu = () => {
                   <MenuItem onClick={toggleOpen}>Register</MenuItem>
                 </Link>
               </div>
-          
+            )}
           </div>
         )}
       </div>

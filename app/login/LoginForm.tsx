@@ -12,11 +12,15 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import Heading from "../components/products/Heading";
 import { signIn } from "next-auth/react";
+import { SafeUser } from "@/types";
 
 
 
 
-const LoginForm = () => {
+interface LoginFormProps {
+  currentUser: SafeUser | null;
+}
+const LoginForm: React.FC<LoginFormProps> = ({ currentUser }) => {
   const [isLoading, setIsLoading] = useState(false);
   const {
     register,
@@ -28,8 +32,14 @@ const LoginForm = () => {
       password: "",
     },
   });
-
   const router = useRouter();
+
+  useEffect(() => {
+    if (currentUser) {
+      router.push("/cart");
+      router.refresh();
+    }
+  }, []);
 
  const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
@@ -50,7 +60,9 @@ const LoginForm = () => {
       }
     });
   };
-
+  if (currentUser) {
+    return <p className="text-center">Logged in. Redirecting...</p>;
+  }
  
   return (
     <>
@@ -60,7 +72,7 @@ const LoginForm = () => {
         label="Continue with Google"
         icon={AiOutlineGoogle}
         onClick={() => {
-          
+          signIn("google")
         }}
       />
       <hr className="bg-slate-300 w-full h-px" />
