@@ -9,7 +9,8 @@ interface ButtonProps {
   small?: boolean;
   custom?: string;
   icon?: IconType;
-  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void; // <- rendu optionnel
+  type?: "button" | "submit"; // <- ajouté pour les boutons de formulaire
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -20,9 +21,11 @@ const Button: React.FC<ButtonProps> = ({
   custom,
   icon: Icon,
   onClick,
+  type = "button", // <- type par défaut
 }) => {
   return (
     <button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       className={`
@@ -42,7 +45,7 @@ const Button: React.FC<ButtonProps> = ({
         ${small ? "text-sm font-light" : "text-md font-semibold"}
         ${small ? "py-1 px-2 border-[1px]" : "py-3 px-4 border-2"}
         ${custom ? custom : ""}
-        `}
+      `}
     >
       {Icon && <Icon size={24} />}
       {label}

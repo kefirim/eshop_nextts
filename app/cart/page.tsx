@@ -1,15 +1,14 @@
-import { Container } from "@mui/material";
+import getCurrentUser from "@/actions/getCurrentUser";
+import Container from "../components/nav/Container";
 import CartClient from "./CartClient";
 
-
-
 const Cart = async () => {
-
+  const currentUser = await getCurrentUser();
 
   return (
     <div className="pt-8">
       <Container>
-        <CartClient />
+        <CartClient currentUser={currentUser} />
       </Container>
     </div>
   );
