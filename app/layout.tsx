@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;     // Typage TypeScript : children est un élément React
 }) {
   return (
-    <html lang="en">            
+    <html lang="en" suppressHydrationWarning>            
       <body className={`${poppins.className} text-slate-700`} >
       <Toaster
           toastOptions={{
