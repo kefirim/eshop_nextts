@@ -1,41 +1,33 @@
 import Container from "@/app/components/nav/Container";
-import ProductDetails from "./ProductDetails";
-import { products } from "@/utils/products";
-import ListRating from "./ListRating";
 
-interface IParams {
-  productId: string;
+import ListRating from "./ListRating";
+import getProductById from "@/actions/getProductById";
+import NullData from "@/app/components/NullData";
+
+import getCurrentUser from "@/actions/getCurrentUser";
+import ProductDetails from "./ProductDetails";
+
+interface IPrams {
+  productId?: string;
 }
 
-// 👇 async ici est la clé
-const ProductPage = async ({ params }: { params: IParams }) => {
-  console.log("params", params);
+const Product = async({ params }: { params: IPrams }) => {
 
-  // Si params est async dans ton contexte, le bug sera évité.
-  const product = products.find((p) => p.id === params.productId);
+  const product = await getProductById(params)
+  const user = await getCurrentUser()
 
-  if (!product) {
-    return (
-      <Container>
-        <div className="p-8 text-center text-red-600">
-          Produit non trouvé.
-        </div>
-      </Container>
-    );
-  }
+  if(!product) return <NullData title="Oops! Product with the given id does not exist"/>
 
   return (
     <div className="p-8">
       <Container>
-        <ProductDetails products={product} />
-          <div className="flex flex-col mt-20 gap-4">
-          <div>AddRating </div>
-           <ListRating product={product} />
-           
+        <ProductDetails product={product} />
+        <div className="flex flex-col mt-20 gap-4">
+          <ListRating product={product} />
         </div>
       </Container>
     </div>
   );
 };
 
-export default ProductPage;
+export default Product;

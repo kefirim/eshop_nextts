@@ -12,7 +12,7 @@ import { useCallback, useEffect, useState } from "react";
 import { MdCheckCircle } from "react-icons/md";
 
 interface ProductDetailsProps {
-  products: any;
+  product: any;
 }
 
 export type CartProductType = {
@@ -36,12 +36,12 @@ const Horizontal = () => {
   return <hr className="w-[30%] my-2" />;
 };
 
-const ProductDetails: React.FC<ProductDetailsProps> = ({ products }) => {
+const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   if (
-    !products ||
-    !products.images ||
-    products.images.length === 0 ||
-    !products.reviews
+    !product ||
+    !product.images ||
+    product.images.length === 0 ||
+    !product.reviews
   ) {
     return <p>Produit non disponible ou données manquantes.</p>;
   }
@@ -49,14 +49,14 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ products }) => {
 
   const [isProductInCart, setIsProductInCart] = useState(false);
   const [cartProduct, setCartProduct] = useState<CartProductType>({
-    id: products.id,
-    name: products.name,
-    description: products.description,
-    category: products.category,
-    brand: products.brand,
-    selectedImg: { ...products.images[0] },
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    category: product.category,
+    brand: product.brand,
+    selectedImg: { ...product.images[0] },
     quantity: 1,
-    price: products.price,
+    price: product.price,
   });
 
    const router = useRouter();
@@ -66,7 +66,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ products }) => {
 
     if (cartProducts) {
       const existingIndex = cartProducts.findIndex(
-        (item) => item.id === products.id
+        (item) => item.id === product.id
       );
       console.log(cartProduct)
 
@@ -74,13 +74,13 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ products }) => {
         setIsProductInCart(true);
       }
     }
-  }, [cartProducts,products.id]);
+  }, [cartProducts,product.id]);
 
   // Calcul sécurisé de la note moyenne
   const productRating =
-    products.reviews.length > 0
-      ? products.reviews.reduce((acc: number, item: any) => item.rating + acc, 0) /
-        products.reviews.length
+    product.reviews.length > 0
+      ? product.reviews.reduce((acc: number, item: any) => item.rating + acc, 0) /
+        product.reviews.length
       : 0;
 
   const handleColorSelect = useCallback((value: SelectedImgType) => {
@@ -107,26 +107,26 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ products }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
       <ProductImage
         cartProduct={cartProduct}
-        products={products}
+        products={product}
         handleColorSelect={handleColorSelect}
       />
       <div className="flex flex-col gap-1 text-slate-500 text-sm">
-        <h2 className="text-3xl font-medium text-slate-700">{products.name}</h2>
+        <h2 className="text-3xl font-medium text-slate-700">{product.name}</h2>
         <div className="flex items-center gap-2">
           <Rating value={productRating} readOnly />
-          <div>{products.reviews.length} reviews</div>
+          <div>{product.reviews.length} reviews</div>
         </div>
         <Horizontal />
-        <div className="text-justify">{products.description}</div>
+        <div className="text-justify">{product.description}</div>
         <Horizontal />
         <div>
-          <span className="font-semibold">CATEGORY:</span> {products.category}
+          <span className="font-semibold">CATEGORY:</span> {product.category}
         </div>
         <div>
-          <span className="font-semibold">BRAND:</span> {products.brand}
+          <span className="font-semibold">BRAND:</span> {product.brand}
         </div>
-        <div className={products.inStock ? "text-teal-400" : "text-rose-400"}>
-          {products.inStock ? "In stock" : "Out of stock"}
+        <div className={product.inStock ? "text-teal-400" : "text-rose-400"}>
+          {product.inStock ? "In stock" : "Out of stock"}
         </div>
         <Horizontal />
         {isProductInCart ? (
@@ -149,7 +149,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ products }) => {
           <>
             <SetColor
               cartProduct={cartProduct}
-              images={products.images}
+              images={product.images}
               handleColorSelect={handleColorSelect}
             />
             <Horizontal />

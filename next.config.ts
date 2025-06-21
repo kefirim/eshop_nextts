@@ -1,10 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      "m.media-amazon.com",  // ✅ ici tu ajoutes ce domaine
-      "firebasestorage.googleapis.com" ,
-      "lh3.googleusercontent.com" 
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "m.media-amazon.com",
+      },
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "9199", // très important pour Firebase local
+      },
     ],
   },
 };
