@@ -27,98 +27,92 @@ type ExtendedOrder = Order & {
   user: User;
 };
 
+type RowType = {
+  id: string;
+  customer: string;
+  amount: string;
+  paymentStatus: string;
+  date: string;
+  deliveryStatus: string; // ✅ plus de null ici
+};
+
 const ManageOrdersClient: React.FC<ManageOrdersClientProps> = ({ orders }) => {
   const router = useRouter();
-  let rows: any = [];
 
-  if (orders) {
-    rows = orders.map((order) => {
-      return {
-        id: order.id,
-        customer: order.user.name,
-        amount: formatPrice(order.amount / 100),
-        paymentStatus: order.status,
-        date:format(new Date(order.createDate), "dd MMM yyyy"),
-        deliveryStatus: order.deliveryStatus,
-      };
-    });
-  }
+  const rows: RowType[] = orders.map((order) => ({
+    id: order.id,
+    customer: order.user.name || "N/A",
+    amount: formatPrice(order.amount / 100),
+    paymentStatus: order.status,
+    date: format(new Date(order.createDate), "dd MMM yyyy"),
+    deliveryStatus: order.deliveryStatus || "pending", // ✅ fallback si null
+  }));
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 220 },
     { field: "customer", headerName: "Customer Name", width: 130 },
     {
       field: "amount",
-      headerName: "Amount(USD)",
+      headerName: "Amount (USD)",
       width: 130,
-      renderCell: (params) => {
-        return (
-          <div className="font-bold text-slate-800">{params.row.amount}</div>
-        );
-      },
+      renderCell: (params) => (
+        <div className="font-bold text-slate-800">{params.row.amount}</div>
+      ),
     },
     {
       field: "paymentStatus",
       headerName: "Payment Status",
       width: 130,
-      renderCell: (params) => {
-        return (
-          <div>
-            {params.row.paymentStatus === "pending" ? (
-              <Status
-                text="pending"
-                icon={MdAccessTimeFilled}
-                bg="bg-slate-200"
-                color="text-slate-700"
-              />
-            ) : params.row.paymentStatus === "complete" ? (
-              <Status
-                text="completed"
-                icon={MdDone}
-                bg="bg-green-200"
-                color="text-green-700"
-              />
-            ) : (
-              <></>
-            )}
-          </div>
-        );
-      },
+      renderCell: (params) => (
+        <>
+          {params.row.paymentStatus === "pending" ? (
+            <Status
+              text="pending"
+              icon={MdAccessTimeFilled}
+              bg="bg-slate-200"
+              color="text-slate-700"
+            />
+          ) : params.row.paymentStatus === "complete" ? (
+            <Status
+              text="completed"
+              icon={MdDone}
+              bg="bg-green-200"
+              color="text-green-700"
+            />
+          ) : null}
+        </>
+      ),
     },
     {
       field: "deliveryStatus",
       headerName: "Delivery Status",
       width: 130,
-      renderCell: (params) => {
-        return (
-          <div>
-            {params.row.deliveryStatus === "pending" ? (
-              <Status
-                text="pending"
-                icon={MdAccessTimeFilled}
-                bg="bg-slate-200"
-                color="text-slate-700"
-              />
-            ) : params.row.deliveryStatus === "dispatched" ? (
-              <Status
-                text="dispatched"
-                icon={MdDeliveryDining}
-                bg="bg-purple-200"
-                color="text-purple-700"
-              />
-            ) : params.row.deliveryStatus === "delivered" ? (
-              <Status
-                text="delivered"
-                icon={MdDone}
-                bg="bg-green-200"
-                color="text-green-700"
-              />
-            ) : (
-              <></>
-            )}
-          </div>
-        );
-      },
+      renderCell: (params) => (
+        <>
+          {params.row.deliveryStatus === "pending" ? (
+            <Status
+              text="pending"
+              icon={MdAccessTimeFilled}
+              bg="bg-slate-200"
+              color="text-slate-700"
+            />
+          ) : params.row.deliveryStatus === "dispatched" ? (
+            <Status
+              text="dispatched"
+              icon={MdDeliveryDining}
+              bg="bg-purple-200"
+              color="text-purple-700"
+            />
+          ) : params.row.deliveryStatus === "delivered" ? (
+            <Status
+              text="delivered"
+              icon={MdDone}
+              bg="bg-green-200"
+              color="text-green-700"
+            />
+          ) : null}
+        </>
+      ),
     },
     {
       field: "date",
@@ -129,30 +123,22 @@ const ManageOrdersClient: React.FC<ManageOrdersClientProps> = ({ orders }) => {
       field: "action",
       headerName: "Actions",
       width: 200,
-      renderCell: (params) => {
-        return (
-          <div className="flex justify-between gap-4 w-full">
-            <ActionBtn
-              icon={MdDeliveryDining}
-              onClick={() => {
-                handleDispatch(params.row.id);
-              }}
-            />
-            <ActionBtn
-              icon={MdDone}
-              onClick={() => {
-                handleDeliver(params.row.id);
-              }}
-            />
-            <ActionBtn
-              icon={MdRemoveRedEye}
-              onClick={() => {
-                router.push(`/order/${params.row.id}`);
-              }}
-            />
-          </div>
-        );
-      },
+      renderCell: (params) => (
+        <div className="flex justify-between gap-4 w-full">
+          <ActionBtn
+            icon={MdDeliveryDining}
+            onClick={() => handleDispatch(params.row.id)}
+          />
+          <ActionBtn
+            icon={MdDone}
+            onClick={() => handleDeliver(params.row.id)}
+          />
+          <ActionBtn
+            icon={MdRemoveRedEye}
+            onClick={() => router.push(`/order/${params.row.id}`)}
+          />
+        </div>
+      ),
     },
   ];
 
@@ -162,15 +148,14 @@ const ManageOrdersClient: React.FC<ManageOrdersClientProps> = ({ orders }) => {
         id,
         deliveryStatus: "dispatched",
       })
-      .then((res) => {
+      .then(() => {
         toast.success("Order Dispatched");
         router.refresh();
       })
-      .catch((err) => {
+      .catch(() => {
         toast.error("Oops! Something went wrong");
-        console.log(err);
       });
-  }, []);
+  }, [router]);
 
   const handleDeliver = useCallback((id: string) => {
     axios
@@ -178,15 +163,14 @@ const ManageOrdersClient: React.FC<ManageOrdersClientProps> = ({ orders }) => {
         id,
         deliveryStatus: "delivered",
       })
-      .then((res) => {
+      .then(() => {
         toast.success("Order Delivered");
         router.refresh();
       })
-      .catch((err) => {
+      .catch(() => {
         toast.error("Oops! Something went wrong");
-        console.log(err);
       });
-  }, []);
+  }, [router]);
 
   return (
     <div className="max-w-[1150px] m-auto text-xl">

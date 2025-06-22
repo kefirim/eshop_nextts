@@ -8,14 +8,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2025-05-28.basil",
 });
 
-const calculateOrderAmount = (items: CartProductType[]) => {
+const calculateOrderAmount = (items: CartProductType[]): number => {
   const totalPrice = items.reduce((acc, item) => {
     const itemTotal = item.price * item.quantity;
     return acc + itemTotal;
   }, 0);
 
-  const price: any = Math.floor(totalPrice);
-
+  const price: number = Math.floor(totalPrice);
   return price;
 };
 
@@ -29,6 +28,7 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { items, payment_intent_id } = body;
   const total = calculateOrderAmount(items) * 100;
+
   const orderData = {
     user: { connect: { id: currentUser.id } },
     amount: total,
@@ -50,23 +50,21 @@ export async function POST(request: Request) {
         { amount: total }
       );
 
-      // update the order
-      const [existing_order, update_order] = await Promise.all([
-        prisma.order.findFirst({
-          where: { paymentIntentId: payment_intent_id },
-        }),
-        prisma.order.update({
-          where: { paymentIntentId: payment_intent_id },
-          data: {
-            amount: total,
-            products: items,
-          },
-        }),
-      ]);
+      const existing_order = await prisma.order.findFirst({
+        where: { paymentIntentId: payment_intent_id },
+      });
 
       if (!existing_order) {
         return NextResponse.error();
       }
+
+      await prisma.order.update({
+        where: { paymentIntentId: payment_intent_id },
+        data: {
+          amount: total,
+          products: items,
+        },
+      });
 
       return NextResponse.json({ paymentIntent: updated_intent });
     }
@@ -88,6 +86,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ paymentIntent });
   }
 
-   // Return a default response (e.g., an error response) if none of the conditions are met
-   return NextResponse.error();
+  return NextResponse.error();
 }

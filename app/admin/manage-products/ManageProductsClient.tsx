@@ -17,7 +17,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { deleteObject, ref } from "firebase/storage";
-import { storage } from "@/libs/firebase"; // Import direct de l'instance storage
+import { storage } from "@/libs/firebase";
+
 import Heading from "@/app/components/products/Heading";
 import ActionBtn from "@/app/components/ActionBtn";
 import Status from "@/app/components/Status";
@@ -26,31 +27,41 @@ interface ManageProductsClientProps {
   products: Product[];
 }
 
-const ManageProductsClient: React.FC<ManageProductsClientProps> = ({
-  products,
-}) => {
+type ProductImage = {
+  image: string;
+  color: string;
+  colorCode: string;
+};
+
+type RowType = {
+  id: string;
+  name: string;
+  price: string;
+  category: string;
+  brand: string;
+  inStock: boolean;
+  images: ProductImage[];
+};
+
+const ManageProductsClient: React.FC<ManageProductsClientProps> = ({ products }) => {
   const router = useRouter();
 
-  let rows: any = [];
-
-  if (products) {
-    rows = products.map((product) => ({
-      id: product.id,
-      name: product.name,
-      price: formatPrice(product.price),
-      category: product.category,
-      brand: product.brand,
-      inStock: product.inStock,
-      images: product.images,
-    }));
-  }
+  const rows: RowType[] = products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    price: formatPrice(product.price),
+    category: product.category,
+    brand: product.brand,
+    inStock: product.inStock,
+    images: product.images as unknown as ProductImage[], // 🔒 safe cast si tu sais que c'est bien structuré
+  }));
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 220 },
     { field: "name", headerName: "Name", width: 220 },
     {
       field: "price",
-      headerName: "Price(USD)",
+      headerName: "Price (USD)",
       width: 100,
       renderCell: (params) => (
         <div className="font-bold text-slate-800">{params.row.price}</div>
@@ -60,7 +71,7 @@ const ManageProductsClient: React.FC<ManageProductsClientProps> = ({
     { field: "brand", headerName: "Brand", width: 100 },
     {
       field: "inStock",
-      headerName: "inStock",
+      headerName: "In Stock",
       width: 120,
       renderCell: (params) =>
         params.row.inStock ? (
@@ -95,7 +106,7 @@ const ManageProductsClient: React.FC<ManageProductsClientProps> = ({
           />
           <ActionBtn
             icon={MdRemoveRedEye}
-            onClick={() => router.push(`product/${params.row.id}`)}
+            onClick={() => router.push(`/product/${params.row.id}`)}
           />
         </div>
       ),
@@ -118,12 +129,12 @@ const ManageProductsClient: React.FC<ManageProductsClientProps> = ({
           console.error(err);
         });
     },
-    []
+    [router]
   );
 
   const handleDelete = useCallback(
-    async (id: string, images: any[]) => {
-      toast("Deleting product, please wait!");
+    async (id: string, images: ProductImage[]) => {
+      toast("Deleting product, please wait...");
 
       try {
         for (const item of images) {
@@ -148,7 +159,7 @@ const ManageProductsClient: React.FC<ManageProductsClientProps> = ({
           console.error(err);
         });
     },
-    []
+    [router]
   );
 
   return (
