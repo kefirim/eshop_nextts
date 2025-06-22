@@ -11,7 +11,8 @@ const SearchBar = () => {
         register,
         handleSubmit,
         reset,
-        formState: {errors}
+        // on enlève errors car non utilisé
+        formState: {} 
     } = useForm<FieldValues>({
         defaultValues: {
             searchTerm: ''
@@ -32,16 +33,18 @@ const SearchBar = () => {
         reset()
     }
 
-    return ( <div className="flex items-center">
+    return ( 
+      <div className="flex items-center">
         <input 
-        {...register('searchTerm')}
-        autoComplete="off"
-        type="text"
-        placeholder="Explore E~Shop"
-        className="p-2 border border-gray-300 rounded-l-md focus:outline-none focus:bourder-[0.5px] focus:border-slate-500 w-80"
+          {...register('searchTerm')}
+          autoComplete="off"
+          type="text"
+          placeholder="Explore E~Shop"
+          className="p-2 border border-gray-300 rounded-l-md focus:outline-none focus:bourder-[0.5px] focus:border-slate-500 w-80"
         />
         <button onClick={handleSubmit(onSubmit)} className="bg-slate-700 hover:opacity-80 text-white p-2 rounded-r-md">Search</button>
-    </div> );
+      </div> 
+    );
 }
  
 export default SearchBar;

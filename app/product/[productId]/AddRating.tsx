@@ -32,7 +32,7 @@ const AddRating:React.FC<AddRatingProps> = ({product, user}) => {
         }
     })
 
-    const setCustomValue = (id:string, value: any) =>{
+    const setCustomValue = (id:string, value: number | null) =>{
         setValue(id, value, {
             shouldTouch: true,
             shouldDirty: true,
@@ -64,24 +64,26 @@ const AddRating:React.FC<AddRatingProps> = ({product, user}) => {
 
    const deliveredOrder = user?.orders.some(order => order.products.find(item => item.id === product.id) && order.deliveryStatus === 'delivered')
 
-    const userReview = product?.reviews.find(((review: Review) =>{
+    const userReview = product?.reviews.find((review: Review) =>{
         return review.userId === user.id
-    }))
+    })
 
     if(userReview || !deliveredOrder) return null
 
     return ( <div className="flex flex-col gap-2 max-w-[500px]">
         <Heading title='Rate this product'/>
-        <Rating onChange={(event, newValue) =>{
+        <Rating 
+          onChange={(event: React.SyntheticEvent<Element, Event>, newValue: number | null) =>{
             setCustomValue('rating', newValue)
-        }}/>
+          }}
+        />
         <Input
-        id='comment'
-        label="Comment"
-        disabled = {isLoading}
-        register={register}
-        errors={errors}
-        required
+          id='comment'
+          label="Comment"
+          disabled = {isLoading}
+          register={register}
+          errors={errors}
+          required
         />
         <Button label={isLoading ? "Loading" : 'Rate Product'} onClick={handleSubmit(onSubmit)}/>
     </div> );

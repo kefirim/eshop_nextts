@@ -8,6 +8,7 @@ import Image from "next/image";
 
 interface ProductImageProps {
   cartProduct: CartProductType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   products: any;
   handleColorSelect: (value: SelectedImgType) => void;
 }

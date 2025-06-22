@@ -34,16 +34,15 @@ export type SelectedImgType = {
 const Horizontal = () => <hr className="w-[30%] my-2" />;
 
 const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
-  // Toujours appeler les hooks en haut, hors conditions
+  // Hooks appelés toujours en haut, sans condition
   const { handleAddProductToCart, cartProducts } = useCart();
-
   const [isProductInCart, setIsProductInCart] = useState(false);
   const [cartProduct, setCartProduct] = useState<CartProductType | null>(null);
-
   const router = useRouter();
 
+  // Initialisation du cartProduct dès que product est dispo
   useEffect(() => {
-    if (!product) return; // sécurité
+    if (!product) return;
 
     setCartProduct({
       id: product.id,
@@ -56,16 +55,9 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
       price: product.price,
     });
 
-    setIsProductInCart(false);
-
-    if (cartProducts) {
-      const existingIndex = cartProducts.findIndex(
-        (item) => item.id === product.id
-      );
-      if (existingIndex > -1) {
-        setIsProductInCart(true);
-      }
-    }
+    setIsProductInCart(
+      cartProducts ? cartProducts.some((item) => item.id === product.id) : false
+    );
   }, [cartProducts, product]);
 
   // Si produit manquant ou données invalides, on affiche un message
@@ -78,17 +70,21 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
     return <p>Produit non disponible ou données manquantes.</p>;
   }
 
-  // Calcul sécurisé de la note moyenne
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const productRating =
     product.reviews.length > 0
       ? product.reviews.reduce((acc: number, item: any) => item.rating + acc, 0) /
         product.reviews.length
       : 0;
 
-  const handleColorSelect = useCallback((value: SelectedImgType) => {
-    if (!cartProduct) return;
-    setCartProduct({ ...cartProduct, selectedImg: value });
-  }, [cartProduct]);
+  // Gestion du changement de couleur
+  const handleColorSelect = useCallback(
+    (value: SelectedImgType) => {
+      if (!cartProduct) return;
+      setCartProduct({ ...cartProduct, selectedImg: value });
+    },
+    [cartProduct]
+  );
 
   const handleQtyIncrease = useCallback(() => {
     if (!cartProduct) return;

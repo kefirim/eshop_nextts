@@ -25,6 +25,8 @@ type ExtendedOrder = Order & {
 
 const OrdersClient: React.FC<OrdersClientProps> = ({ orders }) => {
   const router = useRouter();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let rows: any = [];
 
   if (orders) {
@@ -35,8 +37,8 @@ const OrdersClient: React.FC<OrdersClientProps> = ({ orders }) => {
         amount: formatPrice(order.amount / 100),
         paymentStatus: order.status,
         date: formatDistanceToNow(new Date(order.createDate), {
-      addSuffix: true,
-    }),
+          addSuffix: true,
+        }),
         deliveryStatus: order.deliveryStatus,
       };
     });

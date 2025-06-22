@@ -7,12 +7,14 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
   const router = useRouter();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const productRating =
     data.reviews.reduce((acc: number, item: any) => item.rating + acc, 0) /
     data.reviews.length;

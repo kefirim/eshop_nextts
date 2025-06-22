@@ -1,4 +1,5 @@
 "use client";
+
 import { useCart } from "@/hooks/useCart";
 import Link from "next/link";
 import { MdArrowBack } from "react-icons/md";
@@ -66,9 +67,7 @@ const CartClient: React.FC<CartClientProps> = ({ currentUser }) => {
         <div className="w-[90px]">
           <Button
             label="Clear Cart"
-            onClick={() => {
-              handleClearCart();
-            }}
+            onClick={handleClearCart} 
             small
             outline
           />

@@ -4,9 +4,8 @@ import Heading from "@/app/components/products/Heading";
 import { Avatar, Rating } from "@mui/material";
 import { format } from "date-fns";
 
-
 interface ListRatingProps {
-  product: any;
+  product: any; // tu gardes any ici comme demandé
 }
 
 const ListRating: React.FC<ListRatingProps> = ({ product }) => {
@@ -17,7 +16,7 @@ const ListRating: React.FC<ListRatingProps> = ({ product }) => {
       <Heading title="Product Review" />
       <div className="text-sm mt-2">
         {product.reviews &&
-          
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           product.reviews.map((review: any) => {
             const date = new Date(review.createdDate);
             const formatted = format(date, "dd MMMM yyyy");
