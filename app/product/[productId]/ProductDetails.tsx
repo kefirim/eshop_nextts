@@ -7,12 +7,11 @@ import SetQuatity from "@/app/components/products/SetQuantity";
 import { useCart } from "@/hooks/useCart";
 import { Rating } from "@mui/material";
 import { useRouter } from "next/navigation";
-//import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { MdCheckCircle } from "react-icons/md";
 
 interface ProductDetailsProps {
-  product: any;
+  product: any; // à typer mieux si possible
 }
 
 export type CartProductType = {
@@ -32,11 +31,44 @@ export type SelectedImgType = {
   image: string;
 };
 
-const Horizontal = () => {
-  return <hr className="w-[30%] my-2" />;
-};
+const Horizontal = () => <hr className="w-[30%] my-2" />;
 
 const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
+  // Toujours appeler les hooks en haut, hors conditions
+  const { handleAddProductToCart, cartProducts } = useCart();
+
+  const [isProductInCart, setIsProductInCart] = useState(false);
+  const [cartProduct, setCartProduct] = useState<CartProductType | null>(null);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!product) return; // sécurité
+
+    setCartProduct({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      category: product.category,
+      brand: product.brand,
+      selectedImg: { ...product.images[0] },
+      quantity: 1,
+      price: product.price,
+    });
+
+    setIsProductInCart(false);
+
+    if (cartProducts) {
+      const existingIndex = cartProducts.findIndex(
+        (item) => item.id === product.id
+      );
+      if (existingIndex > -1) {
+        setIsProductInCart(true);
+      }
+    }
+  }, [cartProducts, product]);
+
+  // Si produit manquant ou données invalides, on affiche un message
   if (
     !product ||
     !product.images ||
@@ -45,36 +77,6 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   ) {
     return <p>Produit non disponible ou données manquantes.</p>;
   }
-  const { handleAddProductToCart, cartProducts } = useCart();
-
-  const [isProductInCart, setIsProductInCart] = useState(false);
-  const [cartProduct, setCartProduct] = useState<CartProductType>({
-    id: product.id,
-    name: product.name,
-    description: product.description,
-    category: product.category,
-    brand: product.brand,
-    selectedImg: { ...product.images[0] },
-    quantity: 1,
-    price: product.price,
-  });
-
-   const router = useRouter();
-
-  useEffect(() => {
-    setIsProductInCart(false);
-
-    if (cartProducts) {
-      const existingIndex = cartProducts.findIndex(
-        (item) => item.id === product.id
-      );
-      console.log(cartProduct)
-
-      if (existingIndex > -1) {
-        setIsProductInCart(true);
-      }
-    }
-  }, [cartProducts,product.id]);
 
   // Calcul sécurisé de la note moyenne
   const productRating =
@@ -84,24 +86,32 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
       : 0;
 
   const handleColorSelect = useCallback((value: SelectedImgType) => {
-    setCartProduct((prev) => {
-      return { ...prev, selectedImg: value };
-    });
-  }, []);
+    if (!cartProduct) return;
+    setCartProduct({ ...cartProduct, selectedImg: value });
+  }, [cartProduct]);
 
   const handleQtyIncrease = useCallback(() => {
+    if (!cartProduct) return;
     setCartProduct((prev) => {
+      if (!prev) return prev;
       if (prev.quantity >= 99) return prev;
       return { ...prev, quantity: prev.quantity + 1 };
     });
-  }, []);
+  }, [cartProduct]);
 
   const handleQtyDecrease = useCallback(() => {
+    if (!cartProduct) return;
     setCartProduct((prev) => {
+      if (!prev) return prev;
       if (prev.quantity <= 1) return prev;
       return { ...prev, quantity: prev.quantity - 1 };
     });
-  }, []);
+  }, [cartProduct]);
+
+  if (!cartProduct) {
+    // Evite le rendu avant initialisation du cartProduct
+    return null;
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -139,9 +149,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
               <Button
                 label="View Cart"
                 outline
-                onClick={() => {
-                 router.push("/cart")
-                }}
+                onClick={() => router.push("/cart")}
               />
             </div>
           </>
@@ -162,9 +170,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
             <div className="max-w-[300px]">
               <Button
                 label="Add To Cart"
-                onClick={() => {
-                   handleAddProductToCart(cartProduct);
-                }}
+                onClick={() => handleAddProductToCart(cartProduct)}
               />
             </div>
           </>
