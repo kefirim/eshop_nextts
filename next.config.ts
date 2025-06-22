@@ -17,7 +17,8 @@ const nextConfig = {
       {
         protocol: "http",
         hostname: "localhost",
-        port: "9199", // très important pour Firebase local
+        port: "9199", // pour Firebase Storage Emulator
+        pathname: "/v0/**", // AJOUT TRÈS IMPORTANT
       },
     ],
   },
